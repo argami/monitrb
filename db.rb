@@ -81,7 +81,6 @@ class Service
 
 	class << self
 	  def new_parse(server, ser)
-	  	puts ser
 		  service = server.services.new
 			service.name = ser['name']
 			service.type = ser.xpath('//type').first.content
