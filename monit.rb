@@ -1,6 +1,11 @@
 require './db.rb'
 
+
 class Monitrb < Sinatra::Base
+	use Rack::Auth::Basic, "Restricted Area" do |username, password|
+	  [username, password] == ['monit', 'monit']
+	end
+
   get '/' do
     'Hello Monitrb!'
   end
