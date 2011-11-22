@@ -1,7 +1,16 @@
-Mongoid.load!("db/mongoid.yml")
+def value(doc, xpath)
+	x = doc.xpath(xpath)
+	if x.count > 0 then
+		x.first.content
+	else
+		""
+	end
+end
+
 
 class Server
   include Mongoid::Document
+
 	field :localhostname, type: String
 
 	has_many :serverplatforms, dependent: :delete
@@ -45,18 +54,18 @@ class Serverplatform
 	field :swap, type: Integer
 
 	def new_parse(doc)
-		self.uptime  = doc.xpath('//server/uptime').first.content
-		self.poll = doc.xpath('//server/poll').first.content
-		self.startdelay = doc.xpath('//server/startdelay').first.content
-		self.controlfile = doc.xpath('//server/controlfile').first.content
+		self.uptime  = 		value(doc,'//server/uptime')
+		self.poll = 			value(doc,'//server/poll')
+		self.startdelay = value(doc, '//server/startdelay')
+		self.controlfile = value(doc, '//server/controlfile')
 
-		self.name = doc.xpath('//platform/name').first.content
-		self.release = doc.xpath('//platform/release').first.content
-		self.version = doc.xpath('//platform/version').first.content
-		self.machine = doc.xpath('//platform/machine').first.content
-		self.cpu = doc.xpath('//platform/cpu').first.content
-		self.memory = doc.xpath('//platform/memory').first.content
-		self.swap = doc.xpath('//platform/swap').first.content
+		self.name = value(doc, '//platform/name')
+		self.release = value(doc, '//platform/release')
+		self.version = value(doc, '//platform/version')
+		self.machine = value(doc,'//platform/machine')
+		self.cpu = value(doc, '//platform/cpu')
+		self.memory = value(doc,'//platform/memory')
+		self.swap = value(doc,'//platform/swap')
 	end
 end
 
@@ -78,17 +87,17 @@ class Service
 
 	class << self
 	  def new_parse(server, ser)
-		  service = server.services.new
+			service = server.services.new
 			service.name = ser['name']
-			service.type = ser.xpath('//type').first.content
-			service.collected_sec = ser.xpath('//collected_sec').first.content
-			service.collected_usec = ser.xpath('//collected_usec').first.content
-			service.status = ser.xpath('//status').first.content
-			service.status_hint  = ser.xpath('//status_hint').first.content
-			service.monitor = ser.xpath('//monitor').first.content
-			service.monitormode = ser.xpath('//monitormode').first.content
-			service.pendingaction = ser.xpath('//pendingaction').first.content
-			service.status_message = ser.xpath('//status_message').first.content
+			service.type = value(ser, '//type')
+			service.collected_sec = value(ser, '//collected_sec')
+			service.collected_usec = value(ser, '//collected_usec')
+			service.status = value(ser, '//status')
+			service.status_hint  = value(ser, '//status_hint')
+			service.monitor = value(ser, '//monitor')
+			service.monitormode = value(ser, '//monitormode')
+			service.pendingaction = value(ser, '//pendingaction')
+			service.status_message = value(ser, '//status_message')
 			service.save
 		end
 	end	
@@ -111,14 +120,14 @@ class Event
 	class << self
 	  def new_parse(server, _event)
 			event = server.events.new
-			event.collected_sec = _event.xpath('collected_sec').first.content
-			event.collected_usec = _event.xpath('collected_usec').first.content
-			event.service = _event.xpath('service').first.content
-			event.type = _event.xpath('type').first.content
-			event.id = _event.xpath('id').first.content
-			event.state = _event.xpath('state').first.content
-			event.action = _event.xpath('action').first.content
-			event.message = _event.xpath('message').first.content
+			event.collected_sec = value(_event, 'collected_sec')
+			event.collected_usec = value(_event, 'collected_usec')
+			event.service = value(_event, 'service')
+			event.type = value(_event, 'type')
+			event.id = value(_event, 'id')
+			event.state = value(_event, 'state')
+			event.action = value(_event, 'action')
+			event.message = value(_event, 'message')
 			event.save
 		end
 	end	

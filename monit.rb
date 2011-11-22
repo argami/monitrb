@@ -8,6 +8,10 @@ class Monitrb < Sinatra::Base
     'Hello Monitrb!'
   end
   
+  get '/collector' do
+  end
+
+
   post '/collector' do
     Server.parse(request.body.read)
   end
