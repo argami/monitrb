@@ -8,7 +8,7 @@ class Monitrb < Sinatra::Base
   end
   
   get '/collector' do
-    
+    ""
   end
 
   post '/collector' do
