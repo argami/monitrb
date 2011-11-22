@@ -1,7 +1,4 @@
-Mongoid.configure do |config|
-  config.master = Mongo::Connection.new.db("monit_dev")
-end
-
+Mongoid.load!("mongoid.yml")
 
 class Server
   include Mongoid::Document
