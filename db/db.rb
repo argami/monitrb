@@ -1,4 +1,4 @@
-Mongoid.load!("mongoid.yml")
+Mongoid.load!("db/mongoid.yml")
 
 class Server
   include Mongoid::Document
