@@ -10,12 +10,11 @@ end
 
 class Server
   include Mongoid::Document
+  include Mongoid::Timestamps
 
 	field :localhostname, type: String
 
 	has_many :serverplatforms, dependent: :delete
-	has_many :services, dependent: :delete
-	has_many :events, dependent: :delete
 
 
 	class << self
@@ -23,12 +22,13 @@ class Server
 			doc = Nokogiri::XML(xml)
 			server = Server.find_or_create_by(localhostname: doc.xpath('//server/localhostname').first.content)
 			sp = server.serverplatforms.new
+			sp.xml = xml
 			sp.new_parse(doc)
 			doc.xpath('//service').each do |service|
-				Service.new_parse(server, service)
+				Service.new_parse(sp, service)
 			end
 			doc.xpath('//event').each do |event|
-				Service.new_parse(server, event)
+				Event.new_parse(sp, event)
 			end
 			sp.save()
 		end
@@ -37,8 +37,11 @@ end
 
 class Serverplatform
   include Mongoid::Document
+  include Mongoid::Timestamps
 	
 	belongs_to :server
+	has_many :services, dependent: :delete
+	has_many :events, dependent: :delete
 
 	field :uptime, type: Integer
 	field :poll, type: Integer
@@ -52,6 +55,8 @@ class Serverplatform
 	field :cpu, type: Integer
 	field :memory, type: Integer
 	field :swap, type: Integer
+
+	field :xml
 
 	def new_parse(doc)
 		self.uptime  = 		value(doc,'//server/uptime')
@@ -71,8 +76,9 @@ end
 
 class Service 
   include Mongoid::Document
+  include Mongoid::Timestamps
 	
-	belongs_to :server
+	belongs_to :serverplatform
 
 	field :name, type: String
 	field :type, type: Integer
@@ -105,29 +111,30 @@ end
 
 class Event 
   include Mongoid::Document
+  include Mongoid::Timestamps
 	
-	belongs_to :server
+	belongs_to :serverplatform
 
-	field :collected_sec, type: Integer
-	field :collected_usec, type: Integer
-	field :service, type: String
-	field :type, type: Integer
-	field :id, type: Integer
-	field :state, type: Integer
-	field :action, type: Integer
-	field :message, type: String
+	field :collected_sec
+	field :collected_usec
+	field :service
+	field :type
+	field :event_id
+	field :state
+	field :action
+	field :message
 
 	class << self
 	  def new_parse(server, _event)
 			event = server.events.new
-			event.collected_sec = value(_event, 'collected_sec')
-			event.collected_usec = value(_event, 'collected_usec')
-			event.service = value(_event, 'service')
-			event.type = value(_event, 'type')
-			event.id = value(_event, 'id')
-			event.state = value(_event, 'state')
-			event.action = value(_event, 'action')
-			event.message = value(_event, 'message')
+			event.collected_sec = value(_event, '//collected_sec')
+			event.collected_usec = value(_event, '//collected_usec')
+			event.service = value(_event, '//service')
+			event.type = value(_event, '//type')
+			event.event_id = value(_event, '//id')
+			event.state = value(_event, '//state')
+			event.action = value(_event, '//action')
+			event.message = value(_event, '//message')
 			event.save
 		end
 	end	
