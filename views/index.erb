@@ -9,44 +9,22 @@
     <div class="server rounded">
       <h2 class="rounded">
         <strong>
+          <span title="status" class="dot status <%= server.system.status == 0 ? 'running' : 'failure' %>">&middot;</span>
+          <span title="monitored" class="dot monitored <%= server.system.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
           <a href="#"><%= server.localhostname %></a>
-          <% if server.system.methods.include?(:status) %>
-            <span title="status" class="dot status <%= server.system.status == 0 ? 'running' : 'failure' %>">&middot;</span>
-            <span title="monitored" class="dot monitored <%= server.system.monitored == 1 ? 'running' : 'failure' %>">&middot;</span>
-            <%= "<em>#{server.system.message}</em>" if server.system.message %>
-          <% end %>
+          <%= "<em>#{server.system.status_message}</em>" if server.system.status_message %>
         </strong>
 
         <small>
-          <span class="info"><span class="label">cpu:    </span><%= server.system.cpu    || 'N/A' %></span>
-          <span class="info"><span class="label">memory: </span><%= server.system.memory || 'N/A' %></span>
-          <span class="info"><span class="label">swap:   </span><%= server.system.swap   || 'N/A' %></span>
-          <span class="info"><span class="label">uptime: </span><%= time_in_words(server.system.uptime) || 'N/A' %></span>
+          <span class="info"><span class="label">load:   </span><%= server.system.load_avg01   || 'N/A' %></span>
+          <span class="info"><span class="label">cpu:    </span><%= server.system.cpu_system    || 'N/A' %></span>
+          <span class="info"><span class="label">memory: </span><%= server.system.memory_percent || 'N/A' %></span>
+          <span class="info"><span class="label">swap:   </span><%= server.system.swap_percent   || 'N/A' %></span>
+          <span class="info"><span class="label">uptime: </span><%= time_in_words(server.system.serverplatform.uptime) || 'N/A' %></span>
         </small>
       </h2>
 
       <div class="content">
-        <div class="segment processes">
-          <h3>Processes</h3>
-          <ul>
-            <% server.system.services.each do |process| %>
-            <li>
-              <strong>
-                <span class="dot status <%= process.status == 0 ? 'running' : 'failure' %>">&middot;</span>
-                <span class="dot monitored <%= process.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
-                <%= process.name %>
-                <% unless process.monitor == 1 %><span class="label warning">NOT MONITORED</span><% end %>
-              </strong>
-
-              <small>
-              </small>
-            </li>
-            <% end %>
-          </ul>
-          <div class="clear"></div>
-        </div><!-- /processes -->
-
-        <% if server.system.methods.include?(:status) %>
         <div class="segment filesystems">
           <h3>Filesystem</h3>
           <ul class="clearfix">
@@ -54,7 +32,7 @@
             <li>
               <strong title="(<%= fs.usage %> of <%= fs.total %>)">
                 <span class="dot status <%= fs.status == 0 ? 'running' : 'failure' %>">&middot;</span>
-                <span class="dot monitored <%= fs.monitored == 1 ? 'running' : 'failure' %>">&middot;</span>
+                <span class="dot monitored <%= fs.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
                 <%= fs.name %>
               </strong>
               <%= fs.percent %>%  
@@ -64,6 +42,29 @@
           <div class="clear"></div>
         </div><!-- /filesystems -->
 
+        <div class="segment processes">
+          <h3>Processes</h3>
+          <ul>
+            <% server.processes.each do |process| %>
+            <li>
+              <strong>
+                <span class="dot status <%= process.status == 0 ? 'running' : 'failure' %>">&middot;</span>
+                <span class="dot monitored <%= process.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
+                <%= process.name %>
+                <% unless process.monitored == 1 %><span class="label warning">NOT MONITORED</span><% end %>
+              </strong>
+
+              <small>
+                <span class="info"><span class="label">cpu:    </span><%= process.cpu    || 'N/A' %></span>
+                <span class="info"><span class="label">memory: </span><%= process.memory || 'N/A' %></span>
+                <span class="info"><span class="label">uptime: </span><%= time_in_words(process.uptime) || 'N/A' %></span>
+              </small>
+            </li>
+            <% end %>
+          </ul>
+          <div class="clear"></div>
+        </div><!-- /processes -->
+
         <div class="segment hosts">
           <h3>Hosts</h3>
           <ul>
@@ -71,7 +72,7 @@
             <li>
               <strong>
                 <span class="dot status <%= host.status == 0 ? 'running' : 'failure' %>">&middot;</span>
-                <span class="dot monitored <%= host.monitored == 1 ? 'running' : 'failure' %>">&middot;</span>
+                <span class="dot monitored <%= host.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
                 <%= host.name %>
                 <% unless host.monitored == 1 %><span class="label warning">NOT MONITORED</span><% end %>
               </strong>
@@ -84,7 +85,7 @@
           </ul>
           <div class="clear"></div>
         </div><!-- /hosts -->
-        <% end %>
+
       </div><!-- /content -->
 
       <div class="clear"></div>

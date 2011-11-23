@@ -34,9 +34,23 @@ class Server
 	end
 
 	def system
-		serverplatforms.last
+		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
 	end
 
+	def filesystems
+		[]
+		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+	end
+
+	def processes
+		[]
+		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+	end
+
+	def hosts
+		[]
+		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+	end
 
 end
 
@@ -260,6 +274,10 @@ class Service
 			service.save
 		end
 	end	
+
+	# def method_missing(m, *args, &block)  
+ #    ""
+ #  end
 end
 
 class Event 
