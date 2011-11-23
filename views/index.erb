@@ -51,12 +51,12 @@
                 <span class="dot status <%= process.status == 0 ? 'running' : 'failure' %>">&middot;</span>
                 <span class="dot monitored <%= process.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
                 <%= process.name %>
-                <% unless process.monitored == 1 %><span class="label warning">NOT MONITORED</span><% end %>
+                <% unless process.monitor == 1 %><span class="label warning">NOT MONITORED</span><% end %>
               </strong>
 
               <small>
-                <span class="info"><span class="label">cpu:    </span><%= process.cpu    || 'N/A' %></span>
-                <span class="info"><span class="label">memory: </span><%= process.memory || 'N/A' %></span>
+                <span class="info"><span class="label">cpu:    </span><%= process.cpu_percent    || 'N/A' %></span>
+                <span class="info"><span class="label">memory: </span><%= process.memory_percenttotal || 'N/A' %></span>
                 <span class="info"><span class="label">uptime: </span><%= time_in_words(process.uptime) || 'N/A' %></span>
               </small>
             </li>

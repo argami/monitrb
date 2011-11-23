@@ -43,8 +43,7 @@ class Server
 	end
 
 	def processes
-		[]
-		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_PROCESS)
 	end
 
 	def hosts
@@ -247,8 +246,8 @@ class Service
 	class << self
 	  def new_parse(server, ser)
 			service = server.services.new
-			service.name = ser['name'] || value(ser, '//name')
-			service.type = ser['type'] || value(ser, '//type')
+			service.name = ser['name'] || value(ser, '//service/name')
+			service.type = ser['type'] || value(ser, '//service/type')
 			service.collected_sec = value(ser, '//collected_sec')
 			service.collected_usec = value(ser, '//collected_usec')
 			service.status = value(ser, '//status')
