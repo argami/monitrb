@@ -1,6 +1,6 @@
 development:
     host: localhost
-    database: monitrb_dev
+    database: monitrb
 
 
 production:

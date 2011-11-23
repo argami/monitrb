@@ -16,7 +16,6 @@ class Server
 
 	has_many :serverplatforms, dependent: :delete
 
-
 	class << self
 		def parse(xml)
 			doc = Nokogiri::XML(xml)
@@ -33,6 +32,12 @@ class Server
 			sp.save()
 		end
 	end
+
+	def system
+		serverplatforms.last
+	end
+
+
 end
 
 class Serverplatform
@@ -74,6 +79,33 @@ class Serverplatform
 	end
 end
 
+
+##############################################
+#
+# types:
+# 		define TYPE_FILESYSTEM    0
+# 		define TYPE_DIRECTORY     1
+# 		define TYPE_FILE          2
+# 		define TYPE_PROCESS       3
+# 		define TYPE_HOST          4
+# 		define TYPE_SYSTEM        5
+# 		define TYPE_FIFO          6
+# 		define TYPE_PROGRAM       7
+#
+##############################################
+
+module ServiceTypes
+	TYPE_FILESYSTEM = 0
+	TYPE_DIRECTORY  = 1
+	TYPE_FILE       = 2
+	TYPE_PROCESS    = 3
+	TYPE_HOST       = 4
+	TYPE_SYSTEM     = 5
+	TYPE_FIFO       = 6
+	TYPE_PROGRAM    = 7
+end
+
+
 class Service 
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -91,11 +123,118 @@ class Service
 	field :pendingaction, type: Integer
 	field :status_message, type: String
 
+	                      
+	#TYPE_FILE - TYPE_FIFO - TYPE_DIRECTORY
+	def file_fifo_dir(xml)
+		self[:timestamp] = value(xml, '//timestamp')
+	end
+
+  def file_dir_filesys_fifo(xml)
+    self[:mode] = value(xml, '//mode')
+    self[:uid] = value(xml, '//uid')
+    self[:gid] = value(xml, '//gid')
+  end
+
+	#TYPE_HOST  - TYPE_PROCESS
+  def host_process(xml)
+		self[:port_hostname] = value(xml, '//port/hostname')
+		self[:port_portnumber] = value(xml, '//port/portnumber')
+		self[:port_request] = value(xml, '//port/request')
+		self[:port_protocol] = value(xml, '//port/protocol')
+		self[:port_type] = value(xml, '//port/type')
+		self[:port_responsetime] = value(xml, '//port/responsetime')
+
+		self[:unix_path] = value(xml, '//unix/path')
+		self[:unix_protocol] = value(xml, '//unix/protocol')
+		self[:unix_responsetime] = value(xml, '//unix/responsetime')
+  end
+
+  
+	# TYPE FILESYSTEM = 0
+  def filesystem(xml)
+  	self.file_dir_filesys_fifo(xml)
+
+  	self[:flags] = value(xml, '//block/flags')
+  	self[:block_percent] = value(xml, '//block/percent') 
+  	self[:block_usage] = value(xml, '//block/usage')
+  	self[:block_total] = value(xml, '//block/total')
+  	self[:inode_percent] = value(xml, '//inode/percent')
+  	self[:inode_usage] = value(xml, '//inode/usage')
+  	self[:inode_total] = value(xml, '//inode/total')    	
+  end
+
+  # TYPE_DIRECTORY = 1
+  def directory(xml)
+  	self.file_fifo_dir(xml)
+  	self.file_dir_filesys_fifo(xml)
+  end
+
+	# TYPE_FILE = 2
+	def file(xml)
+		self.file_dir_filesys_fifo(xml)
+		self.file_fifo_dir(xml)
+
+		self[:size] = value(xml, '//size')
+		self[:checksum] = value(xml, '//checksum')
+	end
+	
+	#TYPE PROCESS = 3
+	def monit_process(xml)
+		self.host_process(xml)
+
+		self[:pid] = value(xml, '//pid')
+		self[:ppid] = value(xml, '//ppid')
+		self[:uptime] = value(xml, '//uptime')
+		self[:children] = value(xml, '//children')
+		self[:memory_percent] = value(xml, '//memory/percent')
+		self[:memory_percenttotal] = value(xml, '//memory/percenttotal')
+		self[:memory_kilobyte] = value(xml, '//memory/kilobyte')
+		self[:memory_kilobytetotal] = value(xml, '//memory/kilobytetotal')
+		self[:cpu_percent] = value(xml, '//cpu/percent')
+		self[:cpu_percenttotal] = value(xml, '//cpu/percenttotal')
+	end
+
+	# TYPE HOST = 4
+	def host(xml)
+		self.host_process(xml)
+
+	  self[:icmp_type] = value(xml, '//icmp/type')
+	  self[:icmp_responsetime] = value(xml, '//icmp/responsetime')
+	end
+
+	#TYPE SYSTEM = 5     
+	#SYSTEM/***/***
+	def system(xml)
+		self[:load_avg01] = value(xml, '//system/load/avg01')
+		self[:load_avg05] = value(xml, '//system/load/avg05')
+		self[:load_avg15] = value(xml, '//system/load/avg15')
+		self[:cpu_user] = value(xml, '//system/cpu/user')
+		self[:cpu_system] = value(xml, '//system/cpu/system')
+		self[:cpu_wait] = value(xml, '//system/cpu/wait')
+		self[:memory_percent] = value(xml, '//system/memory/percent')
+		self[:memory_kilobyte] = value(xml, '//system/memory/kilobyte')
+		self[:swap_percent] = value(xml, '//system/swap/percent')
+		self[:swap_kilobyte] = value(xml, '//system/swap/kilobyte')
+	end
+
+	#TYPE FIFO = 6
+	def fifo(xml)
+		self.file_dir_filesys_fifo(xml)
+		self.file_fifo_dir(xml)
+	end
+
+	# TYPE PROGRAM = 7
+	# program/**
+	def program(xml)
+		self[:program_started] = value(xml, '//program/started')
+		self[:program_status] = value(xml, '//program/status')
+	end
+
 	class << self
 	  def new_parse(server, ser)
 			service = server.services.new
-			service.name = ser['name']
-			service.type = value(ser, '//type')
+			service.name = ser['name'] || value(ser, '//name')
+			service.type = ser['type'] || value(ser, '//type')
 			service.collected_sec = value(ser, '//collected_sec')
 			service.collected_usec = value(ser, '//collected_usec')
 			service.status = value(ser, '//status')
@@ -104,6 +243,20 @@ class Service
 			service.monitormode = value(ser, '//monitormode')
 			service.pendingaction = value(ser, '//pendingaction')
 			service.status_message = value(ser, '//status_message')
+
+
+			case service.type
+				when ServiceTypes::TYPE_FILESYSTEM then service.filesystem(ser)
+				when ServiceTypes::TYPE_DIRECTORY then service.directory(ser) 
+				when ServiceTypes::TYPE_FILE then service.file(ser)      
+				when ServiceTypes::TYPE_PROCESS then service.monit_process(ser)
+				when ServiceTypes::TYPE_HOST then service.host(ser)      
+				when ServiceTypes::TYPE_SYSTEM then service.system(ser)    
+				when ServiceTypes::TYPE_FIFO then service.fifo(ser)      
+				when ServiceTypes::TYPE_PROGRAM  then service.program(ser)
+			else
+				puts 'error' 
+			end
 			service.save
 		end
 	end	
