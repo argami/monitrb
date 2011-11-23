@@ -11,13 +11,21 @@ class Monitrb < Sinatra::Base
     #'Hello Monitrb!'
   end
   
-  get '/collector' do
-    ""
+  get '/monit/collector' do
+    "status"
   end
 
-  post '/collector' do
+  post '/monit/collector' do
     Server.parse(request.body.read)
   end
+
+
+  get '/example.json' do
+    content_type :json
+    Server.all.to_json
+  end
+
+
 
   helpers do
     def stylesheet
