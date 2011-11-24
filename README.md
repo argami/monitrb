@@ -28,6 +28,29 @@ In the part of Services they have 8 types of events with diferent data which are
 Using a mongodb all the information is saved in the Service collection but with dynamic field for 
 the especific data for each type
 
+
+Collector
+=========
+
+There's a internal collector  in the url/collector you can send data with a POST request
+
+<pre>
+{ 
+	'server' : 'server_name',
+  	'timestamp' : '2011-11-24 13:18:12 +0100',
+  	'domain' : 'domain_name',
+  	'type' : 'type_name',
+  	'request_ip' : '10.10.10.10',
+	'dataset' : { 
+					:data1 => 'data1', 
+					:data2 => 'data2', 
+					:data3 => 'data3' 
+				}
+}
+
+</pre>
+
+
 Installation
 ============
 
