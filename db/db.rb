@@ -8,6 +8,8 @@ def value(doc, xpath)
 end
 
 
+
+
 class Server
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -15,13 +17,13 @@ class Server
 	field :localhostname, type: String
 
 	has_many :serverplatforms, dependent: :delete
+	has_many :collectors, dependent: :delete
 
 	class << self
 		def parse(xml)
 			doc = Nokogiri::XML(xml)
 			server = Server.find_or_create_by(localhostname: doc.xpath('//server/localhostname').first.content)
-			sp = server.serverplatforms.new
-			sp.xml = xml
+			sp = server.serverplatforms.new(:xml => xml)
 			sp.new_parse(doc)
 			doc.xpath('//service').each do |service|
 				Service.new_parse(sp, service)
@@ -30,6 +32,27 @@ class Server
 				Event.new_parse(sp, event)
 			end
 			sp.save()
+
+			server
+		end
+
+		def parse_json(json)
+			data = json_parse(json)
+			server = Server.find_or_create_by(localhostname: data['server'])
+			coll = server.collectors.new
+			coll.timestamp = data['timestamp']
+			coll.type = data['type']
+			coll.request_ip = data['request_ip']
+			coll.domain = data['domain']
+			coll.request = json
+			coll.save
+			
+			ds = coll.datasets.new 
+			data['dataset'].each {|k,v| ds[k] = evaluate(v) }
+			ds.save
+			
+			server.save
+			server
 		end
 	end
 
@@ -52,6 +75,33 @@ class Server
 	end
 
 end
+
+
+class Collector
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  belongs_to :server
+
+  field :timestamp
+  field :type
+  field :request_ip
+  field :request
+  field :domain
+
+  has_many :datasets
+
+end
+
+class	Dataset
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  belongs_to :collector
+end
+
+
+
 
 class Serverplatform
   include Mongoid::Document

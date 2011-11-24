@@ -1,5 +1,4 @@
 class Monitrb < Sinatra::Base
-	set :template, '/path/to/my/template.erb'
 
   use Rack::Auth::Basic, "Restricted Area" do |username, password|
 	  [username, password] == ['monit', 'monit']
@@ -8,7 +7,6 @@ class Monitrb < Sinatra::Base
   get '/' do
     @servers = Server.all
     erb :index
-    #'Hello Monitrb!'
   end
   
   get '/monit/collector' do
@@ -20,9 +18,8 @@ class Monitrb < Sinatra::Base
   end
 
 
-  get '/example.json' do
-    content_type :json
-    Server.all.to_json
+  post '/collector' do
+    Server.parse_json(request.body.read)
   end
 
 
