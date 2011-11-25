@@ -40,7 +40,6 @@ There's a internal collector  in the url/collector you can send data with a POST
   	'timestamp' : '2011-11-24 13:18:12 +0100',
   	'domain' : 'domain_name',
   	'type' : 'type_name',
-  	'request_ip' : '10.10.10.10',
 	'dataset' : { 
 					:data1 => 'data1', 
 					:data2 => 'data2', 
