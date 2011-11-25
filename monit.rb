@@ -19,7 +19,7 @@ class Monitrb < Sinatra::Base
 
 
   post '/collector' do
-    Server.parse_json(request.body.read)
+    Server.parse_json(request.body.read, request.ip)
   end
 
 

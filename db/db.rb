@@ -36,13 +36,13 @@ class Server
 			server
 		end
 
-		def parse_json(json)
+		def parse_json(json, ip)
 			data = json_parse(json)
 			server = Server.find_or_create_by(localhostname: data['server'])
 			coll = server.collectors.new
 			coll.timestamp = data['timestamp']
 			coll.type = data['type']
-			coll.request_ip = data['request_ip']
+			coll.request_ip = ip
 			coll.domain = data['domain']
 			coll.request = json
 			coll.save
@@ -111,6 +111,9 @@ class Serverplatform
 	has_many :services, dependent: :delete
 	has_many :events, dependent: :delete
 
+	field :server_id, type: String
+	field :incarnation, type: String
+	field :server_version, type: String
 	field :uptime, type: Integer
 	field :poll, type: Integer
 	field :startdelay, type: Integer
@@ -127,14 +130,17 @@ class Serverplatform
 	field :xml
 
 	def new_parse(doc)
-		self.uptime  = 		value(doc,'//server/uptime')
-		self.poll = 			value(doc,'//server/poll')
+		self.server_id  = value(doc,'//server/id') || doc['id']
+		self.incarnation  = value(doc,'//server/incarnation') || doc['incarnation']
+		self.server_version  = value(doc,'//server/version') || doc['version']
+		self.uptime  = 	value(doc,'//server/uptime')
+		self.poll = value(doc,'//server/poll')
 		self.startdelay = value(doc, '//server/startdelay')
 		self.controlfile = value(doc, '//server/controlfile')
 
 		self.name = value(doc, '//platform/name')
 		self.release = value(doc, '//platform/release')
-		self.version = value(doc, '//platform/version')
+		self.version = value(doc, '//platform/version') 
 		self.machine = value(doc,'//platform/machine')
 		self.cpu = value(doc, '//platform/cpu')
 		self.memory = value(doc,'//platform/memory')
@@ -245,16 +251,16 @@ class Service
 	def monit_process(xml)
 		self.host_process(xml)
 
-		self[:pid] = value(xml, '//pid')
-		self[:ppid] = value(xml, '//ppid')
-		self[:uptime] = value(xml, '//uptime')
-		self[:children] = value(xml, '//children')
-		self[:memory_percent] = value(xml, '//memory/percent')
-		self[:memory_percenttotal] = value(xml, '//memory/percenttotal')
-		self[:memory_kilobyte] = value(xml, '//memory/kilobyte')
-		self[:memory_kilobytetotal] = value(xml, '//memory/kilobytetotal')
-		self[:cpu_percent] = value(xml, '//cpu/percent')
-		self[:cpu_percenttotal] = value(xml, '//cpu/percenttotal')
+		self[:pid] = value(xml, 'pid')
+		self[:ppid] = value(xml, 'ppid')
+		self[:uptime] = value(xml, 'uptime')
+		self[:children] = value(xml, 'children')
+		self[:memory_percent] = value(xml, 'memory/percent')
+		self[:memory_percenttotal] = value(xml, 'memory/percenttotal')
+		self[:memory_kilobyte] = value(xml, 'memory/kilobyte')
+		self[:memory_kilobytetotal] = value(xml, 'memory/kilobytetotal')
+		self[:cpu_percent] = value(xml, 'cpu/percent')
+		self[:cpu_percenttotal] = value(xml, 'cpu/percenttotal')
 	end
 
 	# TYPE HOST = 4
@@ -268,16 +274,16 @@ class Service
 	#TYPE SYSTEM = 5     
 	#SYSTEM/***/***
 	def system(xml)
-		self[:load_avg01] = value(xml, '//system/load/avg01')
-		self[:load_avg05] = value(xml, '//system/load/avg05')
-		self[:load_avg15] = value(xml, '//system/load/avg15')
-		self[:cpu_user] = value(xml, '//system/cpu/user')
-		self[:cpu_system] = value(xml, '//system/cpu/system')
-		self[:cpu_wait] = value(xml, '//system/cpu/wait')
-		self[:memory_percent] = value(xml, '//system/memory/percent')
-		self[:memory_kilobyte] = value(xml, '//system/memory/kilobyte')
-		self[:swap_percent] = value(xml, '//system/swap/percent')
-		self[:swap_kilobyte] = value(xml, '//system/swap/kilobyte')
+		self[:load_avg01] = value(xml, 'system/load/avg01')
+		self[:load_avg05] = value(xml, 'system/load/avg05')
+		self[:load_avg15] = value(xml, 'system/load/avg15')
+		self[:cpu_user] = value(xml, 'system/cpu/user')
+		self[:cpu_system] = value(xml, 'system/cpu/system')
+		self[:cpu_wait] = value(xml, 'system/cpu/wait')
+		self[:memory_percent] = value(xml, 'system/memory/percent')
+		self[:memory_kilobyte] = value(xml, 'system/memory/kilobyte')
+		self[:swap_percent] = value(xml, 'system/swap/percent')
+		self[:swap_kilobyte] = value(xml, 'system/swap/kilobyte')
 	end
 
 	#TYPE FIFO = 6
@@ -296,16 +302,16 @@ class Service
 	class << self
 	  def new_parse(server, ser)
 			service = server.services.new
-			service.name = ser['name'] || value(ser, '//service/name')
-			service.type = ser['type'] || value(ser, '//service/type')
-			service.collected_sec = value(ser, '//collected_sec')
-			service.collected_usec = value(ser, '//collected_usec')
-			service.status = value(ser, '//status')
-			service.status_hint  = value(ser, '//status_hint')
-			service.monitor = value(ser, '//monitor')
-			service.monitormode = value(ser, '//monitormode')
-			service.pendingaction = value(ser, '//pendingaction')
-			service.status_message = value(ser, '//status_message')
+			service.name = ser['name'] || value(ser, 'name')
+			service.type = ser['type'] || value(ser, 'type')
+			service.collected_sec = value(ser, 'collected_sec')
+			service.collected_usec = value(ser, 'collected_usec')
+			service.status = value(ser, 'status')
+			service.status_hint  = value(ser, 'status_hint')
+			service.monitor = value(ser, 'monitor')
+			service.monitormode = value(ser, 'monitormode')
+			service.pendingaction = value(ser, 'pendingaction')
+			service.status_message = value(ser, 'status_message')
 
 
 			case service.type
