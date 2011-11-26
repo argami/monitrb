@@ -57,7 +57,7 @@
               <small>
                 <span class="info"><span class="label">cpu:    </span><%= process.cpu_percent    || 'N/A' %></span>
                 <span class="info"><span class="label">memory: </span><%= process.memory_percenttotal || 'N/A' %></span>
-                <span class="info"><span class="label">uptime: </span><%= time_in_words(process.uptime) || 'N/A' %></span>
+                <span class="info"><span class="label">uptime: </span><%= time_in_words(process.uptime.to_i) || 'N/A' %></span>
               </small>
             </li>
             <% end %>
@@ -99,7 +99,8 @@
 
 <script>
 $(function() {
-  $('#monittr .server .content').hide();
+  //NON hidden on the begin
+  //$('#monittr .server .content').hide();
 
   $('#monittr .server').bind('expand', function() {
     $(this).addClass('expanded').find('.content').show('fast', function() { });
