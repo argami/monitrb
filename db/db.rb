@@ -23,7 +23,9 @@ class Server
 		def parse(xml)
 			doc = Nokogiri::XML(xml)
 			server = Server.find_or_create_by(localhostname: doc.xpath('//server/localhostname').first.content)
+			server.save
 			sp = server.serverplatforms.new(:xml => xml)
+			sp.save
 			sp.new_parse(doc)
 			doc.xpath('//service').each do |service|
 				Service.new_parse(sp, service)
@@ -111,7 +113,7 @@ class Serverplatform
 	has_many :services, dependent: :delete
 	has_many :events, dependent: :delete
 
-	field :server_id, type: String
+	field :monit_id, type: String
 	field :incarnation, type: String
 	field :server_version, type: String
 	field :uptime, type: Integer
@@ -130,7 +132,7 @@ class Serverplatform
 	field :xml
 
 	def new_parse(doc)
-		self.server_id  = value(doc,'//server/id') || doc['id']
+		self.monit_id  = value(doc,'//server/id') || doc['id']
 		self.incarnation  = value(doc,'//server/incarnation') || doc['incarnation']
 		self.server_version  = value(doc,'//server/version') || doc['version']
 		self.uptime  = 	value(doc,'//server/uptime')

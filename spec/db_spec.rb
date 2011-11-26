@@ -2,6 +2,35 @@ require File.dirname(__FILE__) + '/spec_helper'
 require File.dirname(__FILE__) + '/xml_example'
 
 
+describe 'creating server structure' do
+	it 'serverplatform should belong to server ' do
+		server = Server.create!(:localhostname => 'test')
+		sp = server.serverplatforms.new
+		sp.save()
+		server.save()
+
+		server2 = Server.where(:localhostname => 'test').first
+		server2.id.should eql sp.server_id
+		server2.serverplatforms.all.count.should eql 1
+
+		server2.delete
+	end
+
+	it 'should create server serverplatform service and event' do
+		# server = Server.new
+		# sp = server.serverplatforms.new
+		# service = sp.services.new
+		# event = sp.events.new
+		# server.save!
+
+		# server.serverplatforms.count.should eql 1
+		# server.serverplatforms.first.services.count.should eql 1
+		# server.serverplatforms.first.events.count.should eql 1
+	end
+
+end
+
+
 describe 'Validate parsing XML' do
 	describe 'monit with XML_TYPE_5_3' do
 		before(:all) do
@@ -15,7 +44,7 @@ describe 'Validate parsing XML' do
 		it 'should have Serverplatform data' do
 			sp = @server.serverplatforms.first
     	
-    	sp.server_id.should eql 'c0ca02784e2497827de003c276ce7d3f'
+    	sp.monit_id.should eql 'c0ca02784e2497827de003c276ce7d3f'
     	sp.server_version.should eql '5.1.1'
     	sp.incarnation.should eql '1322226793'
     	sp.server_version.should eql '5.1.1'
