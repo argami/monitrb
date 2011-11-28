@@ -9,9 +9,9 @@ class Monitrb < Sinatra::Base
     erb :index
   end
   
-  get '/monit/collector' do
-    "status"
-  end
+  # get '/monit/collector' do
+  #   "status"
+  # end
 
   post '/monit/collector' do
     Server.parse(request.body.read)
