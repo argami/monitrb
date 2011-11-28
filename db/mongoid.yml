@@ -1,7 +1,6 @@
 development:
-    host: localhost
+    host: sql.impulzia.com
     database: monitrb
-
 
 production:
     host: <%= ENV['MONGOID_HOST'] %>
@@ -9,6 +8,8 @@ production:
     # username: <%= ENV['MONGOID_USERNAME'] %>
     # password: <%= ENV['MONGOID_PASSWORD'] %>
     database: <%= ENV['MONGOID_DATABASE'] %>
+    logger: false
+
 
 test:
     host: localhost
