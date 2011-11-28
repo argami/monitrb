@@ -1,3 +1,5 @@
+[![Build Status](http://travis-ci.org/impulzia/monitrb.png)](http://travis-ci.org/impulzia/monitrb)
+
 Description
 ===========
 
