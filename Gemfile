@@ -8,6 +8,8 @@ gem "bson_ext", "~> 1.4"
 
 gem 'json'
 
+gem 'rake'
+
 group :test do
   gem 'rspec',            '2.0.0'
   gem 'faker',            '0.3.1'
