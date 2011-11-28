@@ -1,10 +1,11 @@
-rvm: 1.9.2
 
+rvm:
+ - 1.9.2
 env:
-  - DB=mongodb
+ - DB=mongodb
 
 notifications:
-  email:
-  	- soporte@impulzia.com
-    on_success: never
-    on_failure: always
+ email:
+  - soporte@impulzia.com
+  on_success: never
+  on_failure: always
