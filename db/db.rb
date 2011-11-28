@@ -72,7 +72,7 @@ class Server
 	end
 
 	def hosts
-		[]
+		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_HOST)
 		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
 	end
 
