@@ -14,7 +14,7 @@ class Monitrb < Sinatra::Base
   end
 
   post '/monit/collector' do
-    Server.parse(request.body.read)
+    Server.parse(request.body.read, request.ip)
   end
 
 

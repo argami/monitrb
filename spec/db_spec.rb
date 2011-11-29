@@ -34,7 +34,7 @@ end
 describe 'Validate parsing XML' do
 	describe 'monit with XML_TYPE_5_3' do
 		before(:all) do
-			@server = Server.parse(XML_TYPE_5_3)
+			@server = Server.parse(XML_TYPE_5_3, '10.10.10.10')
 		end
 
 		it 'localhostname should be same as in <localhostname>' do
@@ -44,6 +44,7 @@ describe 'Validate parsing XML' do
 		it 'should have Serverplatform data' do
 			sp = @server.serverplatforms.first
     	
+    	sp.request_ip.should eql '10.10.10.10'
     	sp.monit_id.should eql 'c0ca02784e2497827de003c276ce7d3f'
     	sp.server_version.should eql '5.1.1'
     	sp.incarnation.should eql '1322226793'

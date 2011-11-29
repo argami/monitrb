@@ -20,11 +20,12 @@ class Server
 	has_many :collectors, dependent: :delete
 
 	class << self
-		def parse(xml)
+		def parse(xml, ip)
 			doc = Nokogiri::XML(xml)
 			server = Server.find_or_create_by(localhostname: doc.xpath('//server/localhostname').first.content)
 			server.save
 			sp = server.serverplatforms.new(:xml => xml)
+			sp.request_ip = ip
 			sp.save
 			sp.new_parse(doc)
 			doc.xpath('//service').each do |service|
@@ -110,9 +111,11 @@ class Serverplatform
   include Mongoid::Timestamps
 	
 	belongs_to :server
+
 	has_many :services, dependent: :delete
 	has_many :events, dependent: :delete
 
+	field :request_ip
 	field :monit_id, type: String
 	field :incarnation, type: String
 	field :server_version, type: String
