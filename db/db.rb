@@ -28,7 +28,7 @@ class Server
 			sp.request_ip = ip
 			sp.save
 			sp.new_parse(doc)
-			doc.xpath('//monit/service').each do |service|
+			doc.xpath('//service').each do |service|
 				Service.new_parse(sp, service)
 			end
 			doc.xpath('//event').each do |event|
@@ -331,7 +331,7 @@ class Service
 			else
 				puts "Unrecognize type: #{service.type}" 
 			end
-			service.save
+			service.save if !service.type.blank?
 		end
 	end	
 
