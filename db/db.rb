@@ -329,7 +329,7 @@ class Service
 				when ServiceTypes::TYPE_FIFO then service.fifo(ser)      
 				when ServiceTypes::TYPE_PROGRAM  then service.program(ser)
 			else
-				puts 'error' 
+				puts "Unrecognize type: #{service.type}" 
 			end
 			service.save
 		end
