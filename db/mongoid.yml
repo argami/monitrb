@@ -1,5 +1,5 @@
 development:
-    host: sql.impulzia.com
+    host: localhost
     database: monitrb
 
 production:
