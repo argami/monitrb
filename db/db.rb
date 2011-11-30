@@ -29,7 +29,7 @@ class Server
 			sp.save
 			sp.new_parse(doc)
 			doc.xpath('//service').each do |service|
-				Service.new_parse(sp, service)
+				Service.new_parse(sp, service) if !service['type'].blank? or !value(service, 'type').blank?
 			end
 			doc.xpath('//event').each do |event|
 				Event.new_parse(sp, event)
@@ -331,7 +331,7 @@ class Service
 			else
 				puts "Unrecognize type: #{service.type}" 
 			end
-			service.save if !service.type.blank?
+			service.save
 		end
 	end	
 
