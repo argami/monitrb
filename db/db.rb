@@ -28,7 +28,7 @@ class Server
 			sp.request_ip = ip
 			sp.save
 			sp.new_parse(doc)
-			doc.xpath('//service').each do |service|
+			doc.xpath('//monit/service').each do |service|
 				Service.new_parse(sp, service)
 			end
 			doc.xpath('//event').each do |event|
