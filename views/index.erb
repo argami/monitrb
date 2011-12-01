@@ -5,14 +5,13 @@
   <p id="toggle">+ Expand all</p>
 
   <% @servers.each do |server| %>
-
+    <% if server.system[:status] %>
     <div class="server rounded">
       <h2 class="rounded">
         <strong>
           <span title="status" class="dot status <%= server.system.status == 0 ? 'running' : 'failure' %>">&middot;</span>
           <span title="monitored" class="dot monitored <%= server.system.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
           <a href="#"><%= server.localhostname %></a>
-          <%= "<em>#{server.system.status_message}</em>" if server.system.status_message %>
           <%= "<em>#{server.system.status_message}</em>" if server.system.status_message %>
         </strong>
 
@@ -93,6 +92,13 @@
 
       <div class="clear"></div>
     </div><!-- /server -->
+    <% else %>
+      <h2 class="rounded">
+        <strong>
+          Error Loading <%= server.localhostname %>
+        </strong>
+      </h2>
+    <% end %>
   <% end %>
 
   <div class="clear"></div>
