@@ -15,6 +15,8 @@ class Server
   include Mongoid::Timestamps
 
 	field :localhostname, type: String
+	
+	index :created_at
 
 	has_many :serverplatforms, dependent: :delete
 	has_many :collectors, dependent: :delete
@@ -60,7 +62,7 @@ class Server
 	end
 
 	def system
-		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+		self.serverplatforms.order_by([:created_at, :asc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).last
 	end
 
 	def filesystems
@@ -110,12 +112,12 @@ class Serverplatform
   include Mongoid::Document
   include Mongoid::Timestamps
 	
-	belongs_to :server
+	belongs_to :server, index: true
 
 	has_many :services, dependent: :delete
 	has_many :events, dependent: :delete
 
-	field :request_ip
+	field :request_ip, type: String
 	field :monit_id, type: String
 	field :incarnation, type: String
 	field :server_version, type: String
@@ -184,7 +186,7 @@ class Service
   include Mongoid::Document
   include Mongoid::Timestamps
 	
-	belongs_to :serverplatform
+	belongs_to :serverplatform, index: true
 
 	field :name, type: String
 	field :type, type: Integer
@@ -344,7 +346,7 @@ class Event
   include Mongoid::Document
   include Mongoid::Timestamps
 	
-	belongs_to :serverplatform
+	belongs_to :serverplatform, index: true
 
 	field :collected_sec
 	field :collected_usec
