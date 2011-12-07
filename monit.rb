@@ -10,7 +10,7 @@ class Monitrb < Sinatra::Base
   end
   
   get '/monit/collector' do
-    "status"
+    405
   end
 
   post '/monit/collector' do
