@@ -2,7 +2,7 @@ development:
     host: localhost
     database: monitrb
     logger: false
-    autocreate_indexes: true
+    # autocreate_indexes: true
 
 production:
     host: <%= ENV['MONGOID_HOST'] %>
@@ -11,7 +11,7 @@ production:
     # password: <%= ENV['MONGOID_PASSWORD'] %>
     database: <%= ENV['MONGOID_DATABASE'] %>
     logger: false
-    autocreate_indexes: true
+    # autocreate_indexes: true
 
 test:
     host: localhost

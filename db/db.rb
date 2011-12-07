@@ -17,6 +17,7 @@ class Server
 	field :localhostname, type: String
 	
 	index :created_at
+	index :localhostname
 
 	has_many :serverplatforms, dependent: :delete
 	has_many :collectors, dependent: :delete
@@ -62,12 +63,12 @@ class Server
 	end
 
 	def system
-		self.serverplatforms.order_by([:created_at, :asc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).last
+		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
 	end
 
 	def filesystems
+		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM)
 		[]
-		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
 	end
 
 	def processes
@@ -75,8 +76,8 @@ class Server
 	end
 
 	def hosts
-		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_HOST)
-		#self.serverplatforms.last.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+		#self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_HOST)
+		[]
 	end
 
 end
@@ -114,7 +115,7 @@ class Serverplatform
 	
 	belongs_to :server, index: true
 
-	has_many :services, dependent: :delete
+	embeds_many :services
 	has_many :events, dependent: :delete
 
 	field :request_ip, type: String
@@ -186,7 +187,7 @@ class Service
   include Mongoid::Document
   include Mongoid::Timestamps
 	
-	belongs_to :serverplatform, index: true
+	embedded_in :serverplatform
 
 	field :name, type: String
 	field :type, type: Integer
@@ -198,6 +199,8 @@ class Service
 	field :monitormode, type: Integer
 	field :pendingaction, type: Integer
 	field :status_message, type: String
+	
+	index :type
 
 	                      
 	#TYPE_FILE - TYPE_FIFO - TYPE_DIRECTORY
