@@ -17,7 +17,7 @@
         </strong>
 
         <small>
-          <span class="info"><span class="label">last ip:   </span><%= @system[:request_ip] %></span>
+          <span class="info"><span class="label">last ip:   </span><%= @system.serverplatform.request_ip %></span>
           <span class="info"><span class="label">last heartbeat:   </span><%= @system.updated_at   || 'N/A' %></span>
           <span class="info"><span class="label">load:   </span><%= @system.load_avg01   || 'N/A' %></span>
           <span class="info"><span class="label">cpu:    </span><%= @system.cpu_system    || 'N/A' %></span>
