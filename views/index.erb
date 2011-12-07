@@ -5,26 +5,25 @@
   <p id="toggle">+ Expand all</p>
 
   <% @servers.each do |server| %>
-    <% if server.system[:status] %>
+    <% @system = server.system %>
+    <% if @system[:status] %>
     <div class="server rounded">
       <h2 class="rounded">
         <strong>
-          <span title="status" class="dot status <%= server.system.status == 0 ? 'running' : 'failure' %>">&middot;</span>
-          <span title="monitored" class="dot monitored <%= server.system.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
+          <span title="status" class="dot status <%= @system.status == 0 ? 'running' : 'failure' %>">&middot;</span>
+          <span title="monitored" class="dot monitored <%= @system.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
           <a href="#"><%= server.localhostname %></a>
-          <%= "<em>#{server.system.status_message}</em>" if server.system.status_message %>
+          <%= "<em>#{@system.status_message}</em>" if @system.status_message %>
         </strong>
 
         <small>
-          <% if server.system[:request_ip]  %>
-          <span class="info"><span class="label">last ip:   </span><%= server.system.request_ip %></span>
-          <% end %>
-          <span class="info"><span class="label">last heartbeat:   </span><%= server.system.updated_at   || 'N/A' %></span>
-          <span class="info"><span class="label">load:   </span><%= server.system.load_avg01   || 'N/A' %></span>
-          <span class="info"><span class="label">cpu:    </span><%= server.system.cpu_system    || 'N/A' %></span>
-          <span class="info"><span class="label">memory: </span><%= server.system.memory_percent || 'N/A' %></span>
-          <span class="info"><span class="label">swap:   </span><%= server.system.swap_percent   || 'N/A' %></span>
-          <span class="info"><span class="label">uptime: </span><%= time_in_words(server.system.serverplatform.uptime) || 'N/A' %></span>
+          <span class="info"><span class="label">last ip:   </span><%= @system[:request_ip] %></span>
+          <span class="info"><span class="label">last heartbeat:   </span><%= @system.updated_at   || 'N/A' %></span>
+          <span class="info"><span class="label">load:   </span><%= @system.load_avg01   || 'N/A' %></span>
+          <span class="info"><span class="label">cpu:    </span><%= @system.cpu_system    || 'N/A' %></span>
+          <span class="info"><span class="label">memory: </span><%= @system.memory_percent || 'N/A' %></span>
+          <span class="info"><span class="label">swap:   </span><%= @system.swap_percent   || 'N/A' %></span>
+          <span class="info"><span class="label">uptime: </span><%= time_in_words(@system.serverplatform.uptime) || 'N/A' %></span>
         </small>
       </h2>
 
