@@ -63,7 +63,7 @@ class Server
 	end
 
 	def system
-		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).first
+		self.serverplatforms.order_by([:created_at, :desc]).first.services.where(:type => ServiceTypes::TYPE_SYSTEM).first || Service.new(:type => 5)
 	end
 
 	def filesystems
