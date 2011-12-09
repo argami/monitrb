@@ -6,9 +6,10 @@
 
   <% @servers.each do |server| %>
     <% @system = server.system %>
-    <% if @system[:status] %>
     <div class="server rounded">
       <h2 class="rounded">
+        <% if @system[:status] %>
+        
         <strong>
           <span title="status" class="dot status <%= @system.status == 0 ? 'running' : 'failure' %>">&middot;</span>
           <span title="monitored" class="dot monitored <%= @system.monitor == 1 ? 'running' : 'failure' %>">&middot;</span>
@@ -25,6 +26,18 @@
           <span class="info"><span class="label">swap:   </span><%= @system.swap_percent   || 'N/A' %></span>
           <span class="info"><span class="label">uptime: </span><%= time_in_words(@system.serverplatform.uptime) || 'N/A' %></span>
         </small>
+        <% else %>
+            <strong>
+              <span title="status" class="dot status failure">&middot;</span>
+              <span title="monitored" class="dot monitored failure">&middot;</span>
+              <a href="#"><%= server.localhostname %></a>
+              Error Loading System Data
+            </strong>
+
+            <small>
+              <span class="info"><span class="label">last ip:   </span><%= @system.serverplatform.request_ip %></span>
+            </small>
+        <% end %>
       </h2>
 
       <div class="content">
@@ -93,13 +106,6 @@
 
       <div class="clear"></div>
     </div><!-- /server -->
-    <% else %>
-      <h2 class="rounded">
-        <strong>
-          Error Loading <%= server.localhostname %>
-        </strong>
-      </h2>
-    <% end %>
   <% end %>
 
   <div class="clear"></div>
