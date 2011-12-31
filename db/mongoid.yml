@@ -7,8 +7,8 @@ development:
 production:
     host: <%= ENV['MONGOID_HOST'] %>
     # port: <%= ENV['MONGOID_PORT'] %>
-    # username: <%= ENV['MONGOID_USERNAME'] %>
-    # password: <%= ENV['MONGOID_PASSWORD'] %>
+    username: <%= ENV['MONGOID_USERNAME'] %>
+    password: <%= ENV['MONGOID_PASSWORD'] %>
     database: <%= ENV['MONGOID_DATABASE'] %>
     logger: false
     # autocreate_indexes: true
